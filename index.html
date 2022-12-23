@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cal-OffWork</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <style>
+        @import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+        * {
+            font-family: "Nanum Gothic"!important;
+        }
+        
+        .wrapper{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .content{
+            border-radius: 1rem;
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <div class="container-fluid">
+        <div class="wrapper">
+            <div class="content">
+                <div class="row">
+                    <div class="col">
+                            <div class="row mb-3">
+                                <div class="col" style="text-align: center;"><h2>퇴근시간 계산기</h2></div>
+                            </div>
+                        <form onsubmit="cal_time_of_end();return false;" id="cal-form">
+                            <div class="row mb-3">
+                                <div class="col-2">
+                                    <label for="sworkTime">출근 시간</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="time" class="form-control" name="" id="sworkTime">
+                                </div>
+                                <div class="col-3">
+                                    <div class="float-end"><button type="button" onclick="set_now();" class="btn btn-primary">현재시간</button></div>
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-2">
+                                    <label for="sworkTime">점심 시간</label>
+                                </div>
+                                <div class="col-10">
+                                    <div class="input-group mb-3">
+                                        <input type="time" class="form-control" placeholder="" aria-label="" name="" value="12:30" id="slunch">
+                                        <span class="input-group-text">~</span>
+                                        <input type="time" class="form-control" placeholder="" aria-label="" name="" value="13:30" id="elunch">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col" style="text-align: center; font-size: 20pt;font-weight: bold;"><span >-</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-2">
+                                    <label for="extra_hour">추가 시간</label>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="Hours" aria-label="Hours" value="0" name="" id="extra_hour">
+                                    <span class="input-group-text">시간</span>
+                                    <input type="number" class="form-control" placeholder="Minutes" aria-label="Minutes" value="0" name="" id="extra_min">
+                                    <span class="input-group-text">분</span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col" style="text-align: center; font-size: 20pt;font-weight: bold;"><span >+</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="hour">남은 시간</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" placeholder="Hours" aria-label="Hours" name="" id="left_hour">
+                                        <span class="input-group-text">시간</span>
+                                        <input type="number" class="form-control" placeholder="Minutes" aria-label="Minutes" name="" id="left_min">
+                                        <span class="input-group-text">분</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <button class="col btn btn-primary" type="submit" style="text-align: center; font-size: 20pt;font-weight: bold;"><span >=</span></button>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control" name="" placeholder="퇴근시간이 여기에 표시됩니다." id="result" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cal_time_of_end = ()=>{
+            /**@type {HTMLTimeElement}*/
+            const sworkTime = document.getElementById("sworkTime");
+            const extra_hour = document.getElementById("extra_hour");
+            const slunch_val = document.getElementById("slunch").value.split(":");
+            const elunch_val = document.getElementById("elunch").value.split(":");
+            const extra_min = document.getElementById("extra_min");
+            const left_hour = document.getElementById("left_hour");
+            const left_min = document.getElementById("left_min");
+            const result = document.getElementById("result");
+
+            let input = document.querySelectorAll("#cal-form input")
+
+            for (let index = 0; index < input.length; index++) {
+                const e = input[index];
+                if (e.value === "" || e.value === undefined || e.value === null) {
+                    return false;
+                }
+            }
+
+            const now = new Date();
+            let cal = moment(now.toISOString().split('T')[0] + "T" + sworkTime.value);
+            let sl = moment(now).hour(slunch_val[0]).minute(slunch_val[1]);
+            let el = moment(now).hour(elunch_val[0]).minute(elunch_val[1]);
+            cal.add(Number(left_hour.value) ,'hours');
+            cal.add(Number(left_min.value) ,'minutes');
+            cal.subtract(Number(extra_hour.value) ,'hours');
+            cal.subtract(Number(extra_min.value) ,'minutes');
+            if (cal.isAfter(sl)) {
+                const lunch_time = el.diff(sl)
+                cal.add(lunch_time)
+            }
+            result.innerText = cal.hours >=12 ? "오후" : "오전" + cal.format("hh[시 ]mm[분]") + "에 퇴근 가능!"
+        }
+
+        const set_now = () =>{
+            const now = new Date;
+            const sworkTime = document.getElementById("sworkTime");
+            
+            sworkTime.value = now.toTimeString().slice(0,5);
+        }
+
+
+    </script>
+    
+</body>
+</html>
