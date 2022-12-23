@@ -40,7 +40,7 @@
                             <div class="row mb-3">
                                 <div class="col" style="text-align: center;"><h2>퇴근시간 계산기</h2></div>
                             </div>
-                        <form onsubmit="cal_time_of_end();return false;" id="cal-form">
+                        <form onsubmit="return false;" id="cal-form">
                             <div class="row mb-3">
                                 <div class="col-2">
                                     <label for="sworkTime">출근 시간</label>
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <button class="col btn btn-primary" type="submit" style="text-align: center; font-size: 20pt;font-weight: bold;"><span >=</span></button>
+                                <button class="col btn btn-primary" type="button" onclick="cal_time_of_end()" style="text-align: center; font-size: 20pt;font-weight: bold;"><span >=</span></button>
                             </div>
                         </form>
                         <div class="row">
@@ -140,7 +140,11 @@
                 const lunch_time = el.diff(sl)
                 cal.add(lunch_time)
             }
-            result.innerText = cal.hours >=12 ? "오후" : "오전" + cal.format("hh[시 ]mm[분]") + "에 퇴근 가능!"
+            let aorp = "오전";
+            if (cal.hour() >= 12) {
+                aorp = "오후"
+            }
+            result.value = aorp+ " " + cal.format("hh[시 ]mm[분]") + "에 퇴근 가능!"
         }
 
         const set_now = () =>{
